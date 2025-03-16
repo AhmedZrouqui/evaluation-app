@@ -3,6 +3,7 @@ import sequelize from '../../../config/database';
 import { BaseAttributes } from '../../base/model/base.model';
 import Review from '../../review/model/review.model';
 import AccessToken from '../../accessToken/models/accessToken.model';
+import Kiosk from '../../kiosk/models/kiosk.model';
 
 export interface UserAttributes extends BaseAttributes {
   firstname: string;
@@ -71,6 +72,12 @@ User.init(
   {
     sequelize,
     modelName: 'User',
+    defaultScope: {
+      attributes: {
+        exclude: ['password'],
+      },
+      order: [['createdAt', 'DESC']],
+    },
     tableName: 'users',
     timestamps: true,
   }

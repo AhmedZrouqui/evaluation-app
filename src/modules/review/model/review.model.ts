@@ -6,6 +6,7 @@ import User from '../../user/models/user.model';
 export interface ReviewAttributes extends BaseAttributes {
   comment: string;
   mark: number;
+  userId: number;
 }
 
 interface ReviewCreationAttributes
@@ -20,7 +21,7 @@ class Review
   public mark!: number;
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
-  public readonly user?: User;
+  public readonly userId!: number;
 }
 
 Review.init(
@@ -33,6 +34,14 @@ Review.init(
     comment: {
       type: DataTypes.STRING,
       allowNull: false,
+    },
+    userId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: User,
+        key: 'id',
+      },
     },
     mark: {
       type: DataTypes.INTEGER,

@@ -13,6 +13,29 @@ class UserService {
     this.accessTokenRepository = new AccessTokenRepository();
   }
 
+  async updateUser(
+    id: number,
+    data: Partial<{ firstname: string; lastname: string; phone: string }>
+  ) {
+    return this.userRepository.updateUser(id, data);
+  }
+
+  async deleteUser(id: number) {
+    return await this.userRepository.deleteUser(id);
+  }
+
+  async revokeToken(token: string) {
+    return await this.accessTokenRepository.delete(token);
+  }
+
+  async getUserByToken(token: string) {
+    try {
+      return await this.userRepository.findUserByJWT(token);
+    } catch (error) {
+      throw new Error('Get user by Token error: ' + error);
+    }
+  }
+
   async authenticate({ countryCode, phone, password }: UserAuthAttributes) {
     try {
       const user = await this.userRepository.findUserByCountryCodeAndPhone(
@@ -26,10 +49,14 @@ class UserService {
 
       if (!isMatching) throw new Error('user not found');
 
-      return await this.accessTokenRepository.create(60);
+      return await this.accessTokenRepository.create(3600, user.id);
     } catch (err) {
       throw new Error('Auth error: ' + err);
     }
+  }
+
+  public async getUserById(id: number) {
+    return await this.userRepository.findUserById(id);
   }
 
   public async create({

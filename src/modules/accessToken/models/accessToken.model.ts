@@ -1,10 +1,12 @@
 import { DataTypes, Model, Optional } from 'sequelize';
 import sequelize from '../../../config/database';
+import User from '../../user/models/user.model';
 
 export interface AccessTokenAttributes {
   id: string;
   ttl: number;
   createdAt: Date;
+  userId: number;
 }
 
 export interface AccessTokenCreation
@@ -16,6 +18,8 @@ class AccessToken
 {
   public id!: string;
   public ttl!: number;
+  public userId!: number;
+
   public readonly createdAt!: Date;
 
   public expired(): boolean {
@@ -34,6 +38,14 @@ AccessToken.init(
     ttl: {
       type: DataTypes.INTEGER,
       allowNull: false,
+    },
+    userId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: User,
+        key: 'id',
+      },
     },
     createdAt: {
       type: DataTypes.DATE,

@@ -18,6 +18,7 @@ class AccessTokenService {
     }
 
     if (_token.expired()) {
+      await this.accessTokenRepository.delete(token);
       return {
         valid: false,
         notFound: false,
@@ -31,7 +32,11 @@ class AccessTokenService {
     const accessToken = await this.accessTokenRepository.findToken(token);
     if (!accessToken) return false;
 
-    return !accessToken.expired();
+    const expired = accessToken.expired();
+
+    if (expired) await this.accessTokenRepository.delete(token);
+
+    return !expired;
   }
 }
 

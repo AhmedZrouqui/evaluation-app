@@ -1,10 +1,11 @@
 import AccessToken from '../modules/accessToken/models/accessToken.model';
+import Kiosk from '../modules/kiosk/models/kiosk.model';
 import Review from '../modules/review/model/review.model';
 import User from '../modules/user/models/user.model';
 
 export function initializeAssociations() {
   Review.belongsTo(User, {
-    foreignKey: 'id',
+    foreignKey: 'userId',
     as: 'user',
   });
 
@@ -14,8 +15,18 @@ export function initializeAssociations() {
   });
 
   User.hasMany(AccessToken, {
-    foreignKey: 'id',
+    foreignKey: 'userId',
     as: 'tokens',
+  });
+
+  User.hasOne(Kiosk, {
+    foreignKey: 'userId',
+    as: 'kiosk',
+  });
+
+  Kiosk.belongsTo(User, {
+    foreignKey: 'userId',
+    as: 'user',
   });
 
   console.log('Model associations initialized');

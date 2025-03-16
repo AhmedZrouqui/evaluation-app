@@ -4,6 +4,7 @@ import sequelize from './config/database';
 import { initializeAssociations } from './utils/associations';
 import { initializeTriggers } from './utils/triggers';
 import UserController from './modules/user/controllers/user.controller';
+import KioskController from './modules/kiosk/controllers/kiosk.controller';
 
 dotenv.config();
 
@@ -14,6 +15,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 const userController = new UserController();
+const kioskController = new KioskController();
 
 sequelize
   .sync({ alter: true })
@@ -24,6 +26,7 @@ sequelize
   .catch((err) => console.error('Sync failed:', err));
 
 app.use('/api', userController.router);
+app.use('/api', kioskController.router);
 
 app.get('/', (req, res) => {
   res.send('Hello World!');
