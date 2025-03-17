@@ -1,4 +1,5 @@
-FROM node:18-alpine as builder
+# Builder Stage
+FROM node:18-alpine AS builder
 
 WORKDIR /usr/src/app
 
@@ -6,7 +7,7 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 COPY tsconfig.json ./
 
-# Install all dependencies (including dev dependencies)
+# Install dependencies
 RUN npm install
 
 # Copy the rest of the application code
@@ -15,24 +16,8 @@ COPY . .
 # Build TypeScript code
 RUN npm run build
 
-# Development stage
-FROM node:18-alpine as development
-
-WORKDIR /usr/src/app
-
-# Copy configuration files
-COPY package*.json ./
-COPY tsconfig.json ./
-COPY nodemon.json ./
-
-# Install all dependencies (including dev dependencies)
-RUN npm install
-
-# Copy source code for development
-COPY . .
-
-# Production stage
-FROM node:18-alpine as production
+# Production Stage
+FROM node:18-alpine AS production
 
 WORKDIR /usr/src/app
 
@@ -44,10 +29,12 @@ RUN npm ci --omit=dev
 
 # Copy built files from builder stage
 COPY --from=builder /usr/src/app/dist ./dist
-COPY .env ./
 
-# Expose the port the app runs on
+# Expose the port
 EXPOSE 8080
+
+# Set the default environment (Heroku will override this)
+ENV NODE_ENV=production
 
 # Start the application
 CMD ["node", "dist/index.js"]

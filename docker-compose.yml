@@ -4,17 +4,15 @@ services:
   app:
     build:
       context: .
-      target: development
+      target: production
     ports:
       - "8080:8080"
-    env_file:
-      - .env
     environment:
-      - NODE_ENV=development
-    volumes:
-      - ./src:/usr/src/app/src
-    working_dir: /usr/src/app
-    command: npm run dev
+      - NODE_ENV=production
+      - PORT=8080
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASS=${DB_PASS}
+      - DB_HOST=${DB_HOST}
+    command: ["node", "dist/src/index.js"]
 
-volumes:
-  node_modules:
