@@ -1,16 +1,26 @@
 import Kiosk from '../models/kiosk.model';
 import User from '../../user/models/user.model';
-import { Op, Sequelize } from 'sequelize';
+import { Sequelize } from 'sequelize';
 import Review from '../../review/model/review.model';
 
 class KioskRepository {
   async create(
     title: string,
     description: string,
-    geolocation: object,
+    geolocation: { lat: number; lng: number },
     userId: number
   ) {
-    return await Kiosk.create({ title, description, geolocation, userId });
+    const point = {
+      type: 'Point',
+      coordinates: [geolocation.lng, geolocation.lat],
+    };
+
+    return await Kiosk.create({
+      title,
+      description,
+      geolocation: point,
+      userId,
+    });
   }
 
   async findById(id: number) {
@@ -51,26 +61,19 @@ class KioskRepository {
           include: [
             [
               Sequelize.literal(
-                `ST_Distance(geolocation, ST_SetSRID(ST_MakePoint(${lng}, ${lat}), 4326))`
+                `ST_Distance(geolocation::geography, ST_SetSRID(ST_MakePoint(${lng}, ${lat}), 4326)::geography) / 1000`
               ),
-              'distance',
+              'distance_km',
             ],
           ],
         },
         where: Sequelize.where(
-          Sequelize.fn(
-            'ST_DWithin',
-            Sequelize.col('geolocation'),
-            Sequelize.fn(
-              'ST_SetSRID',
-              Sequelize.fn('ST_MakePoint', lng, lat),
-              4326
-            ),
-            maxDistance
+          Sequelize.literal(
+            `ST_DWithin(geolocation::geography, ST_SetSRID(ST_MakePoint(${lng}, ${lat}), 4326)::geography, ${maxDistance * 1000})`
           ),
           true
         ),
-        order: [[Sequelize.literal('distance'), 'ASC']],
+        order: [[Sequelize.literal('distance_km'), 'ASC']],
         limit: 10,
         offset: (page - 1) * 10 + offset,
         include: [
@@ -84,6 +87,7 @@ class KioskRepository {
       });
     } catch (error) {
       console.error(error);
+      throw error;
     }
   }
 }

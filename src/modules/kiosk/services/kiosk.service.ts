@@ -15,7 +15,7 @@ class KioskService {
   }: {
     title: string;
     description: string;
-    geolocation: object;
+    geolocation: { lat: number; lng: number };
     userId: number;
   }) {
     return this.kioskRepository.create(title, description, geolocation, userId);

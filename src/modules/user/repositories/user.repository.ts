@@ -75,7 +75,7 @@ class UserRepository {
             as: 'tokens',
             where: {
               id: {
-                [Op.eq]: token, // More explicit comparison
+                [Op.eq]: token,
               },
             },
           },
