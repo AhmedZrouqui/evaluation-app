@@ -49,7 +49,9 @@ class UserService {
 
       if (!isMatching) throw new Error('user not found');
 
-      return await this.accessTokenRepository.create(3600, user.id);
+      const token = await this.accessTokenRepository.create(3600, user.id);
+
+      return { token, userId: user.id };
     } catch (err) {
       throw new Error('Auth error: ' + err);
     }

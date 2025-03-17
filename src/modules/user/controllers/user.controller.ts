@@ -96,7 +96,7 @@ class UserController {
     try {
       const { countryCode, phone, password } = req.body;
 
-      const token = await this.userService.authenticate({
+      const response = await this.userService.authenticate({
         countryCode,
         phone,
         password,
@@ -104,7 +104,8 @@ class UserController {
 
       res.status(200).json({
         message: 'Auth success',
-        token: token.id,
+        token: response.token.id,
+        userId: response.userId,
       });
     } catch (error) {
       res.status(500).json({

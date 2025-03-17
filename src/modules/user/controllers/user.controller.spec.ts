@@ -163,7 +163,11 @@ describe('UserController', () => {
 
     it('should successfully authenticate user', async () => {
       const mockToken = createMockAccessToken({});
-      mockUserService.authenticate.mockResolvedValue(mockToken);
+      const mockAuthResponse = {
+        token: mockToken,
+        userId: 1,
+      };
+      mockUserService.authenticate.mockResolvedValue(mockAuthResponse);
 
       await (controller as any).login(
         mockRequest as Request,
@@ -175,6 +179,7 @@ describe('UserController', () => {
       expect(mockJson).toHaveBeenCalledWith({
         message: 'Auth success',
         token: mockToken.id,
+        userId: 1,
       });
     });
 

@@ -130,7 +130,10 @@ describe('UserService', () => {
         3600,
         mockUser.id
       );
-      expect(result).toEqual(mockToken);
+      expect(result).toEqual({
+        token: mockToken,
+        userId: mockUser.id,
+      });
     });
 
     it('should throw error when user not found', async () => {
